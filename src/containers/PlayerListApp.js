@@ -9,10 +9,7 @@ import { PAGE_SIZE } from '../constants/Pagination'
 
 class PlayerListApp extends Component {
   render() {
-    const {
-      playerlist: { playersById },
-    } = this.props;
-
+    const { data, total } = this.getData()
     const { page } = this.state
 
     const actions = {
@@ -25,17 +22,34 @@ class PlayerListApp extends Component {
       <div className={styles.playerListApp}>
         <h1>NBA Players</h1>
         <AddPlayerInput addPlayer={actions.addPlayer} />
-        <PlayerList players={playersById} actions={actions} />
-        <Pagination page={page} pageSize={PAGE_SIZE} total={playersById.length}/>
+        <PlayerList players={data} actions={actions} />
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onSetPage={this.setPage.bind(this)}/>
       </div>
     );
   }
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this.state = {
-      page: 0
+      page: 1
     }
+  }
+
+  // 通过此方法获取列表数据
+  getData () {
+    let result = {}
+    const { page } = this.state
+    const { playerlist: { playersById } } = this.props;
+    result.data = playersById.slice( (page - 1) * PAGE_SIZE , page * PAGE_SIZE)
+    result.total = playersById.length
+    return result
+  }
+
+  // 修改page属性的值
+  setPage (val) {
+    this.setState({
+      page: val
+    })
   }
 }
 
